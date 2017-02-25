@@ -90,9 +90,9 @@
                 //如果事件位置在矩形区域中
                 
                 var hsl = hslToRgb(h/360,x/360,y/360);
-                $('#s').val(Math.round(x*100/360));
-                $('#l').val(Math.round(y*100/360));
-
+                $('#s').val(Math.round(y*100/360));
+                $('#l').val(Math.round(x*100/360));
+                $('#h').val(Math.round(h));
                 $('#red').val(hsl[0]);
                 $('#green').val(hsl[1]);
                 $('#blue').val(hsl[2]);
