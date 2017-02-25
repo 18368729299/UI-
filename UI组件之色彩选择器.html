@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>UI组件之色彩选择器</title>
+    <style>
+        #mycanvas{
+            float:left;
+            /*border: 1px solid #9c9898;*/
+            /*background: white;*/
+        }
+        #mycanvasright{
+            margin-left: 50px;
+            float:left;
+            /*border: 1px solid #9c9898;*/
+            /*background: white;*/
+        }
+        #number{
+            margin-left: 50px;
+            width:300px;    
+            float:left;
+        }
+        #number input{
+            margin-left: 10px;
+            margin-bottom: 5px;
+            margin-top: 5px;
+            width:50px;
+        }
+
+    </style>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.1.min.js"></script> 
+    <script language="JavaScript">
+        // var hy = 0;
+        window.onload=function(){
+            createGradient();
+            var canvas = document.getElementById("mycanvasright");
+            var contex = canvas.getContext("2d");
+            var clg=contex.createLinearGradient(0,0,0,360);
+            clg.addColorStop(0,"#ff0000");
+            clg.addColorStop(0.20,"#ffff00");
+            clg.addColorStop(0.40,"#00ff00");
+            clg.addColorStop(0.60,"#00ffff");
+            clg.addColorStop(0.80,"#0000ff");
+            clg.addColorStop(1,"#ff0000");
+            canvas.onclick=function(e){//给canvas添加点击事件
+                e=e||event;//获取事件对象
+                //获取事件在canvas中发生的位置
+                var x=e.clientX-canvas.offsetLeft;
+                var y=e.clientY-canvas.offsetTop;
+                //如果事件位置在矩形区域中
+                var hsl = hslToRgb(y/360,0.5,0.5);
+                var rgb="#"+hex(hsl[0])+hex(hsl[1])+hex(hsl[2]);  
+                $('#h').val(y);
+                $('#s').val(50);
+                $('#l').val(50);
+                $('#red').val(hsl[0]);
+                $('#green').val(hsl[1]);
+                $('#blue').val(hsl[2]);
+
+
+                createGradient(rgb,y);
+            }
+            contex.fillStyle=clg;
+            contex.fillRect(0,0,20,360);
+        }
+        function createGradient(rbg,h){
+           
+            var canvas = document.getElementById("mycanvas");
+            var contex = canvas.getContext("2d");
+            var clg=contex.createLinearGradient(0,0,360,360);
+
+
+            clg.addColorStop(0,"#ffffff");
+            if(rbg!=''&&rbg!=null){
+                clg.addColorStop(0.5,rbg);
+            }
+            if(h==''||h==null){
+                h=0;
+            }
+            clg.addColorStop(1,"#000000");
+            contex.fillStyle=clg;
+            // contex.strokeStyle=clg;
+            contex.fillRect(0,0,360,360);
+
+            canvas.onclick=function(e){//给canvas添加点击事件
+                e=e||event;//获取事件对象
+                //获取事件在canvas中发生的位置
+                var x=e.clientX-canvas.offsetLeft;
+                var y=e.clientY-canvas.offsetTop;
+                //如果事件位置在矩形区域中
+                
+                var hsl = hslToRgb(h/360,x/360,y/360);
+                $('#s').val(Math.round(x*100/360));
+                $('#l').val(Math.round(y*100/360));
+
+                $('#red').val(hsl[0]);
+                $('#green').val(hsl[1]);
+                $('#blue').val(hsl[2]);
+            }
+            
+        }
+
+
+        /*rgb转化hex*/
+        function hex(x)  
+        {  
+          return ("0"+parseInt(x).toString(16)).slice(-2);  
+        } 
+
+
+        var changecolor = function(){
+            var red = $('#red').val();
+            var green = $('#green').val();
+            var blue = $('#blue').val();
+            if(red==''){red=0;}else if(red<0){red=0;$('#red').val(0);}else if(red>255){red=255;$('#red').val(255);}
+
+            if(green==''){green=0;}else if(green<0){green=0;$('#green').val(0);}else if(green>255){green=255;$('#green').val(255);}
+
+            if(blue==''){blue=0;}else if(blue<0){blue=0;$('#blue').val(0);}else if(blue>255){blue=255;$('#blue').val(255);}//判断rgb做数值限制
+            rgb="#"+hex(red)+hex(green)+hex(blue);  
+
+            createGradient(rgb);
+        }
+
+
+        var changehsl = function(){
+            var h = $('#h').val();
+            var s = $('#s').val();
+            var l = $('#l').val();
+            if(h==''){red=0;}else if(h<0){h=0;$('#h').val(0);}else if(h>360){h=360;$('#h').val(360);}
+
+            if(s==''){s=0;}else if(s<0){s=0;$('#s').val(0);}else if(s>=100){s=100;$('#s').val(100);}
+
+            if(l==''){l=0;}else if(l<0){l=0;$('#l').val(0);}else if(l>=100){l=100;$('#l').val(100);}//判断hsl做数值限制
+            
+            h /= 360;
+            s /= 100;
+            l /= 100;
+
+            var hsl = hslToRgb(h,s,l);
+            var rgb="#"+hex(hsl[0])+hex(hsl[1])+hex(hsl[2]);  
+            createGradient(rgb);
+
+        }
+
+        /*hsl转化rgb*/
+        function hslToRgb(h, s, l){
+            var r, g, b;
+
+            if(s == 0){
+                r = g = b = l; // achromatic
+            }else{
+                var hue2rgb = function hue2rgb(p, q, t){
+                    if(t < 0) t += 1;
+                    if(t > 1) t -= 1;
+                    if(t < 1/6) return p + (q - p) * 6 * t;
+                    if(t < 1/2) return q;
+                    if(t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                    return p;
+                }
+
+                var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                var p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3);
+                g = hue2rgb(p, q, h);
+                b = hue2rgb(p, q, h - 1/3);
+            }
+
+            return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+        }
+        
+    </script>
+   
+</head>
+<body>
+<canvas id="mycanvas" width="360" height="360"></canvas>
+<canvas id="mycanvasright" width="20" height="360"></canvas>
+
+<div id="number" >
+        <div><label>R</label><input id='red' type="number"  oninput="changecolor()" placeholder="0"/></div>
+        <div><label>G</label><input id='green' type="number" oninput="changecolor()" placeholder="0"/></div>
+        <div><label>B</label><input id='blue' type="number" oninput="changecolor()" placeholder="0"/></div>
+        <hr />
+        <div><label>H</label><input id='h' type="number"  oninput="changehsl()" placeholder="0"/>°</div>
+        <div><label>S</label><input id='s' type="number" oninput="changehsl()" placeholder="0"/>%</div>
+        <div><label>L</label><input id='l' type="number" oninput="changehsl()" placeholder="0"/>%</div>
+    </div>
+</body>
+</html>
